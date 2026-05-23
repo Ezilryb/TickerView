@@ -1,11 +1,10 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-
   "name": "tickerview-api",
 
   "functions": {
     "api/chat.js": {
+      "runtime"    : "nodejs20.x",
       "memory"     : 128,
       "maxDuration": 15
     }
@@ -15,17 +14,11 @@
     {
       "source": "/api/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options",        "value": "DENY"    },
-        { "key": "Cache-Control",           "value": "no-store, no-cache, must-revalidate" }
+        { "key": "Access-Control-Allow-Origin",  "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" },
+        { "key": "Access-Control-Max-Age",        "value": "86400" }
       ]
     }
-  ],
-
-  "rewrites": [],
-
-  "env": {
-    "GEMINI_API_KEY1"  : "@gemini_api_key",
-    "ALLOWED_ORIGIN"  : "@allowed_origin"
-  }
+  ]
 }
