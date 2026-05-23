@@ -24,7 +24,7 @@ const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/
  * En dev local  : toutes les origines passent (ALLOWED_ORIGIN=*).
  */
 function corsHeaders(reqOrigin) {
-  const allowed = process.env.ALLOWED_ORIGIN || '*';
+  const allowed = process.env.ALLOWED_ORIGIN1 || '*';
   const origin  = allowed === '*'
     ? '*'
     : (reqOrigin && reqOrigin.includes(allowed) ? reqOrigin : allowed);
