@@ -1,0 +1,16 @@
+{
+  "name": "TickerView — Analyse Orderflow",
+  "short_name": "TickerView",
+  "description": "Terminal d'analyse Orderflow, Footprint Chart et Volume Profile en temps réel.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#060608",
+  "theme_color": "#E8440A",
+  "orientation": "landscape-primary",
+  "icons": [
+    { "src": "/src/assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/src/assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "categories": ["finance", "productivity", "utilities"],
+  "lang": "fr"
+}

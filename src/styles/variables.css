@@ -1,0 +1,86 @@
+/* ══════════════════════════════════════════════════════════════
+   TICKERVIEW — Design Tokens
+   src/styles/variables.css
+══════════════════════════════════════════════════════════════ */
+
+:root,
+[data-theme="dark"] {
+  --bg-base:        #060608;
+  --bg-raised:      #0C0C10;
+  --bg-card:        #131318;
+  --bg-card-hover:  #17171E;
+  --bg-overlay:     rgba(6,6,8,0.88);
+
+  --text-primary:   #E8E6E0;
+  --text-secondary: #5A5750;
+  --text-dim:       rgba(232,230,224,0.42);
+  --text-ghost:     rgba(232,230,224,0.18);
+
+  --accent:         #E8440A;
+  --accent-dim:     rgba(232,68,10,0.10);
+  --accent-glow:    rgba(232,68,10,0.04);
+  --accent-border:  rgba(232,68,10,0.22);
+
+  --blue:           #5E7EFF;
+  --blue-dim:       rgba(94,126,255,0.10);
+
+  --border:         #1E1E24;
+  --border-accent:  rgba(232,68,10,0.18);
+
+  --shadow-card:    none;
+
+  --particle-alpha: 0.65;
+  --canvas-clear:   rgba(6,6,8,0.06);
+}
+
+[data-theme="light"] {
+  --bg-base:        #F2EFE8;
+  --bg-raised:      #FAF8F3;
+  --bg-card:        #FFFFFF;
+  --bg-card-hover:  #F7F4EF;
+  --bg-overlay:     rgba(242,239,232,0.92);
+
+  --text-primary:   #1A1A1E;
+  --text-secondary: #7A756C;
+  --text-dim:       rgba(26,26,30,0.45);
+  --text-ghost:     rgba(26,26,30,0.14);
+
+  --accent:         #D63B06;
+  --accent-dim:     rgba(214,59,6,0.08);
+  --accent-glow:    rgba(214,59,6,0.03);
+  --accent-border:  rgba(214,59,6,0.20);
+
+  --blue:           #3D5CE8;
+  --blue-dim:       rgba(61,92,232,0.10);
+
+  --border:         #E4E0D8;
+  --border-accent:  rgba(214,59,6,0.16);
+
+  --shadow-card:    0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+
+  --particle-alpha: 0.25;
+  --canvas-clear:   rgba(242,239,232,0.08);
+}
+
+:root {
+  --font-display:  'Barlow Condensed', sans-serif;
+  --font-serif:    'Cormorant Garamond', serif;
+  --font-mono:     'IBM Plex Mono', monospace;
+
+  --size-xs:   9px;
+  --size-sm:   11px;
+  --size-base: 13px;
+  --size-md:   16px;
+
+  --tracking-tight:  -0.02em;
+  --tracking-normal:  0.04em;
+  --tracking-wide:    0.14em;
+  --tracking-xwide:   0.22em;
+
+  --radius-sm:  2px;
+  --radius-md:  4px;
+
+  --transition-fast:   0.12s ease;
+  --transition-normal: 0.22s ease;
+  --transition-slow:   0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}

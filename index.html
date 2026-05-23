@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<!-- ══════════════════════════════════════════════════════════
+     TICKERVIEW — Landing Page
+     index.html · Entry point
+     Architecture: /src/styles · /src/components · /src/utils
+══════════════════════════════════════════════════════════════ -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#E8440A">
+
+<!-- ── SEO ────────────────────────────────────────────────── -->
+<title>TickerView — Terminal Orderflow & Footprint Chart Temps Réel</title>
+<meta name="description" content="TickerView est un terminal d'analyse orderflow pour futures traders. Footprint Chart, Delta, Volume Profile (VRVP) sur Binance, CME et Forex — données WebSocket, <50ms.">
+<meta name="keywords" content="orderflow, footprint chart, volume profile, delta, CVD, scalping, futures trading, Binance, analyse technique, crypto trading">
+<meta name="robots" content="index, follow">
+<meta name="author" content="TickerView — Beta Capital Enterprise">
+<link rel="canonical" href="https://tickerview.app/">
+
+<!-- ── Open Graph ─────────────────────────────────────────── -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tickerview.app/">
+<meta property="og:title" content="TickerView — Terminal Orderflow & Footprint Chart">
+<meta property="og:description" content="Footprint Chart natif, Orderflow Delta tick-par-tick, Volume Profile VRVP. Web app — aucune installation. Beta gratuite.">
+<meta property="og:image" content="https://tickerview.app/og-image.jpg">
+<meta property="og:locale" content="fr_FR">
+
+<!-- ── PWA ────────────────────────────────────────────────── -->
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/src/assets/icons/icon-192.png">
+
+<!-- ── Fonts ──────────────────────────────────────────────── -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@200;300;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+<!-- ── Styles (Modular) ───────────────────────────────────── -->
+<link rel="stylesheet" href="src/styles/variables.css">
+<link rel="stylesheet" href="src/styles/global.css">
+
+<!-- ── Structured Data (JSON-LD) ──────────────────────────── -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "TickerView",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Web",
+  "description": "Terminal d'analyse orderflow et footprint chart pour futures traders.",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+  "url": "https://tickerview.app"
+}
+</script>
+</head>
+
+<body>
+
+<!-- Background particle canvas -->
+<canvas id="void-canvas" aria-hidden="true"></canvas>
+
+<!-- ══════════════════════════════════════════════════════════
+     NAV
+══════════════════════════════════════════════════════════════ -->
+<nav role="navigation" aria-label="Navigation principale">
+  <a class="nav-logo" href="#" aria-label="TickerView — Accueil">
+    TICKER<span class="logo-fire">VIEW</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#instruments">Marchés</a></li>
+    <li><a href="#preview">Interface</a></li>
+    <li><a href="#features">Fonctions</a></li>
+    <li><a href="#guides">Guides</a></li>
+  </ul>
+  <div class="nav-actions">
+    <div class="nav-status" aria-label="Statut : données Binance en direct">
+      <span class="nav-dot" aria-hidden="true"></span>
+      <span>BINANCE LIVE</span>
+    </div>
+    <!-- Color mode toggle (src/utils/colorMode.js) -->
+    <button class="theme-toggle" id="theme-toggle" aria-label="Changer le thème" title="Passer en mode clair"></button>
+    <a href="#" class="nav-cta">Ouvrir le terminal →</a>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════════
+     HERO
+══════════════════════════════════════════════════════════════ -->
+<main>
+<section class="hero" aria-labelledby="hero-heading">
+  <div class="hero-text">
+    <p class="hero-eyebrow reveal">Terminal d'analyse orderflow · Web App</p>
+
+    <div class="hero-title-block reveal reveal-delay-1" id="hero-heading">
+      <span class="hero-title-main">TICKER</span>
+      <span class="hero-title-sub">view.</span>
+    </div>
+
+    <p class="hero-tagline reveal reveal-delay-2">
+      Footprint · Orderflow · Volume Profile
+    </p>
+
+    <p class="hero-desc reveal reveal-delay-2">
+      Pour les futures traders et scalpers qui veulent voir ce que les autres ne voient pas.
+      Delta tick-par-tick, imbalances en temps réel, VRVP intégré — sans plugin, sans installation.
+      Crypto, Forex, Indices.
+    </p>
+
+    <!-- Trust signals answering key user questions -->
+    <div class="hero-trust reveal reveal-delay-3">
+      <span class="hero-trust-item">Données WebSocket Binance</span>
+      <span class="hero-trust-item">Web app · Chrome / Firefox</span>
+      <span class="hero-trust-item">Beta gratuite</span>
+    </div>
+
+    <div class="hero-actions reveal reveal-delay-3">
+      <a href="#" class="btn-primary">Ouvrir le terminal →</a>
+      <a href="#preview" class="btn-ghost">Voir l'interface ↓</a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hstat reveal reveal-delay-3">
+        <span class="hstat-val">14 <sub>ex.</sub></span>
+        <span class="hstat-lbl">Exchanges</span>
+      </div>
+      <div class="hstat reveal reveal-delay-4">
+        <span class="hstat-val">&lt;50<sub>ms</sub></span>
+        <span class="hstat-lbl">Latence médiane</span>
+      </div>
+      <div class="hstat reveal reveal-delay-5">
+        <span class="hstat-val">200<sub>+</sub></span>
+        <span class="hstat-lbl">Instruments</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-visual reveal reveal-delay-2" aria-hidden="true">
+    <canvas id="hex-canvas" width="500" height="500" aria-hidden="true"></canvas>
+    <div class="hero-price-overlay">
+      <div class="hpo-sym">BTC/USDT · PERP</div>
+      <div class="hpo-price" id="hero-price">67 842</div>
+      <div class="hpo-change up" id="hero-change">+2.14%  ↑ 24h</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     TICKER TAPE
+══════════════════════════════════════════════════════════════ -->
+<div class="ticker-tape-wrap" aria-hidden="true">
+  <div class="ticker-tape-inner" id="tape"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PRODUCT PREVIEW — "L'interface en action"
+══════════════════════════════════════════════════════════════ -->
+<section class="section-preview" id="preview" aria-labelledby="preview-heading">
+  <div class="section-header">
+    <div class="section-label reveal">Interface produit</div>
+    <div class="section-title reveal reveal-delay-1" id="preview-heading">L'interface en action</div>
+    <div class="section-count reveal">Mockup interactif</div>
+  </div>
+
+  <!-- Tab selector (src/components/ProductPreview/productPreview.js) -->
+  <div class="preview-tabs reveal reveal-delay-1">
+    <button class="ptab active">Footprint Chart</button>
+    <button class="ptab">Volume Profile</button>
+    <button class="ptab">Multi-Chart</button>
+  </div>
+
+  <div class="preview-frame reveal reveal-delay-2">
+    <!-- Terminal top bar -->
+    <div class="preview-topbar">
+      <div class="ptb-dots">
+        <div class="ptb-dot"></div>
+        <div class="ptb-dot"></div>
+        <div class="ptb-dot"></div>
+      </div>
+      <div class="ptb-meta">
+        <span class="ptb-sym">BTC/USDT · BINANCE FUTURES</span>
+        <span class="ptb-tf">5m · AggTrades</span>
+      </div>
+      <div class="ptb-live">
+        <span class="ptb-live-dot"></span>
+        <span>LIVE STREAM</span>
+      </div>
+    </div>
+    <!-- Canvas drawn by productPreview.js -->
+    <div class="preview-canvas-wrap">
+      <canvas id="preview-canvas" aria-label="Aperçu de l'interface TickerView"></canvas>
+      <div class="preview-badge">TickerView Beta · Données simulées</div>
+    </div>
+  </div>
+
+  <!-- Feature callouts under the preview -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin-top:1px;">
+    <div style="background:var(--bg-card);padding:20px 24px;">
+      <div style="font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">Imbalance Detection</div>
+      <div style="font-size:11px;line-height:1.7;color:var(--text-secondary);">Les cellules avec un ratio Ask/Bid ≥ 3× sont automatiquement marquées — les niveaux où les institutionnels agissent.</div>
+    </div>
+    <div style="background:var(--bg-card);padding:20px 24px;">
+      <div style="font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">Delta cumulatif</div>
+      <div style="font-size:11px;line-height:1.7;color:var(--text-secondary);">Le delta total par bougie révèle la pression acheteuse nette. Les divergences Delta/Prix signalent les retournements.</div>
+    </div>
+    <div style="background:var(--bg-card);padding:20px 24px;">
+      <div style="font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">POC & Value Area</div>
+      <div style="font-size:11px;line-height:1.7;color:var(--text-secondary);">Le Point of Control et la Value Area 70% identifient les zones de haute liquidité — support et résistance institutionnels.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     WHY TICKERVIEW — Conversion FAQ
+══════════════════════════════════════════════════════════════ -->
+<div class="why-strip" role="region" aria-label="Questions fréquentes">
+  <div class="why-row reveal">
+    <div class="why-q">Quels marchés ?</div>
+    <div class="why-a"><strong>Crypto Futures</strong> (Binance, OKX, Bybit) · <strong>Forex</strong> (FXCM) · <strong>Futures CME</strong> (NQ, ES, CL) — AAPL, TSLA et indices US en bêta Q3 2026.</div>
+  </div>
+  <div class="why-row reveal">
+    <div class="why-q">Quelle source de données ?</div>
+    <div class="why-a">Stream <strong>AggTrades WebSocket Binance</strong> directement dans le navigateur. Latence médiane mesurée : <strong>&lt;50ms</strong>. Pas d'intermédiaire, pas de polling.</div>
+  </div>
+  <div class="why-row reveal">
+    <div class="why-q">Pourquoi pas TradingView ?</div>
+    <div class="why-a">TradingView n'a pas de <strong>Footprint Chart natif</strong>, ni de delta tick-par-tick, ni de VRVP temps réel sans plugin tiers payant. TickerView intègre tout nativement.</div>
+  </div>
+  <div class="why-row reveal">
+    <div class="why-q">Gratuit ou payant ?</div>
+    <div class="why-a"><strong>Beta publique gratuite</strong>, sans inscription obligatoire. Les plans Pro (multi-exchange, alertes, API export) arriveront post-beta.</div>
+  </div>
+  <div class="why-row reveal">
+    <div class="why-q">Web ou desktop ?</div>
+    <div class="why-a"><strong>Web app pure</strong> — Chrome, Firefox, Edge. Installable comme PWA. Aucune installation, aucun téléchargement. Fonctionne sur Mac, Windows, Linux.</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     LIVE DATA STRIP
+══════════════════════════════════════════════════════════════ -->
+<div class="data-strip" aria-label="Données de marché en direct">
+  <div class="strip-inner" id="data-strip"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     INSTRUMENTS — Géométrie des marchés
+══════════════════════════════════════════════════════════════ -->
+<section class="section" id="instruments" aria-labelledby="instruments-heading">
+  <div class="section-header">
+    <div class="section-label reveal">Marchés couverts</div>
+    <div class="section-title reveal reveal-delay-1" id="instruments-heading">Instruments actifs</div>
+    <div class="section-count reveal">06 / 200+</div>
+  </div>
+  <!-- Populated by src/components/InstrumentGrid/instrumentGrid.js -->
+  <div class="instruments-grid" id="instruments-grid" role="list"></div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     PHILOSOPHY — condensed, less poetic
+══════════════════════════════════════════════════════════════ -->
+<div class="section-philosophy">
+  <div>
+    <blockquote class="phil-quote reveal">
+      "Le volume ne ment pas. La donnée brute, lue correctement, est l'avantage le plus <em>difficile à copier</em> en trading."
+    </blockquote>
+    <p class="phil-attr reveal reveal-delay-1">Philosophie produit · TickerView</p>
+    <p style="font-size:11px;line-height:1.8;color:var(--text-secondary);margin-top:20px;max-width:420px;" class="reveal reveal-delay-2">
+      Conçu par des traders orderflow pour des traders orderflow. Chaque décision d'interface — du footprint à la palette de couleurs — vise à réduire le temps entre la lecture du flux et la prise de décision.
+    </p>
+  </div>
+  <div class="phil-stats reveal reveal-delay-2">
+    <div class="pstat">
+      <span class="pstat-val">AggTrades<span></span></span>
+      <span class="pstat-lbl">Source données<br>Binance WebSocket</span>
+    </div>
+    <div class="pstat">
+      <span class="pstat-val">&lt;50<span>ms</span></span>
+      <span class="pstat-lbl">Latence médiane<br>mesurée en prod</span>
+    </div>
+    <div class="pstat">
+      <span class="pstat-val">Beta<span></span></span>
+      <span class="pstat-lbl">Accès public<br>gratuit · sans compte</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     FEATURES — Architecture de précision
+══════════════════════════════════════════════════════════════ -->
+<section class="section" style="padding-top:60px" id="features" aria-labelledby="features-heading">
+  <div class="section-header" style="margin-bottom:0">
+    <div class="section-label reveal">Capacités analytiques</div>
+    <div class="section-title reveal reveal-delay-1" id="features-heading">Ce que vous obtenez</div>
+  </div>
+  <div class="features-list" role="list">
+
+    <article class="feat-row reveal" role="listitem">
+      <div class="feat-num" aria-hidden="true">01</div>
+      <div>
+        <h3 class="feat-name">Footprint Chart</h3>
+        <p class="feat-tag">Natif · AggTrades · Temps réel</p>
+      </div>
+      <p class="feat-desc">Volume Ask/Bid par niveau de prix. Détection automatique des imbalances ≥ 3×. POC intra-bougie. Coloration delta. <strong>Pas de plugin</strong> — natif dans le navigateur.</p>
+      <div class="feat-arrow" aria-hidden="true">→</div>
+    </article>
+
+    <article class="feat-row reveal" role="listitem">
+      <div class="feat-num" aria-hidden="true">02</div>
+      <div>
+        <h3 class="feat-name">Orderflow Delta</h3>
+        <p class="feat-tag">Tick-par-tick · CVD · Divergences</p>
+      </div>
+      <p class="feat-desc">Pression directionnelle bougie par bougie. CVD cumulatif en overlay. Divergences Delta/Prix — les signaux que les indicateurs classiques ne voient pas.</p>
+      <div class="feat-arrow" aria-hidden="true">→</div>
+    </article>
+
+    <article class="feat-row reveal" role="listitem">
+      <div class="feat-num" aria-hidden="true">03</div>
+      <div>
+        <h3 class="feat-name">Volume Profile</h3>
+        <p class="feat-tag">VRVP · POC · Value Area 70%</p>
+      </div>
+      <p class="feat-desc">Distribution du volume par prix sur la session ou par range personnalisé. Low Volume Nodes, POC, VA — les niveaux que les institutionnels surveillent.</p>
+      <div class="feat-arrow" aria-hidden="true">→</div>
+    </article>
+
+    <article class="feat-row reveal" role="listitem">
+      <div class="feat-num" aria-hidden="true">04</div>
+      <div>
+        <h3 class="feat-name">Multi-Charts</h3>
+        <p class="feat-tag">2 / 4 / 9 panneaux · MTF</p>
+      </div>
+      <p class="feat-desc">Layouts 2×2, 3×3, asymétriques. Analyse multi-timeframe synchronisée. Crosshair global. Corrélations BTC/ETH, crypto/indices, futures/spot — votre workspace.</p>
+      <div class="feat-arrow" aria-hidden="true">→</div>
+    </article>
+
+    <article class="feat-row reveal" role="listitem">
+      <div class="feat-num" aria-hidden="true">05</div>
+      <div>
+        <h3 class="feat-name">Assistant IA</h3>
+        <p class="feat-tag">Claude-powered · Contextuel · Beta</p>
+      </div>
+      <p class="feat-desc">Posez des questions en langage naturel sur le flux en cours. Obtenez des lectures structurées : niveaux-clés, delta bias, configuration orderflow — directement dans l'interface.</p>
+      <div class="feat-arrow" aria-hidden="true">→</div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     CTA
+══════════════════════════════════════════════════════════════ -->
+<section class="section-cta" aria-labelledby="cta-heading">
+  <p class="cta-eyebrow reveal">Beta publique · Gratuit · Aucune inscription</p>
+  <h2 class="cta-title reveal reveal-delay-1" id="cta-heading">VOIR <em>autrement.</em></h2>
+  <p class="cta-sub reveal reveal-delay-2">
+    Footprint natif, delta temps réel, VRVP intégré.<br>
+    Ouvrez le terminal et commencez à trader avec le flow.
+  </p>
+  <a href="#" class="cta-btn reveal reveal-delay-3">Lancer TickerView →</a>
+  <p class="cta-note reveal reveal-delay-4">Web app · Chrome &amp; Firefox · Aucun téléchargement</p>
+</section>
+</main>
+
+<!-- ══════════════════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════════════════════ -->
+<footer role="contentinfo">
+  <div class="footer-logo">TICKER<span>VIEW</span></div>
+  <p class="footer-copy">
+    © 2026 TickerView — Beta Capital Enterprise<br>
+    Données à titre informatif uniquement. Pas de conseil en investissement.
+  </p>
+  <ul class="footer-links">
+    <li><a href="#" id="guides">Risques</a></li>
+    <li><a href="#">Guides</a></li>
+    <li><a href="#">API Docs</a></li>
+    <li><a href="#">Contact</a></li>
+  </ul>
+</footer>
+
+<!-- ══════════════════════════════════════════════════════════
+     JS — ES Modules (Modular Architecture)
+══════════════════════════════════════════════════════════════ -->
+<script type="module">
+/* ── Imports from modular components ──────────────────────── */
+import { initColorMode }       from './src/utils/colorMode.js';
+import { initScrollReveal, initHeroPriceAnimation } from './src/utils/animations.js';
+import { initVoidCanvas }      from './src/components/canvas/voidCanvas.js';
+import { initHexCanvas }       from './src/components/canvas/hexCanvas.js';
+import { renderInstruments }   from './src/components/InstrumentGrid/instrumentGrid.js';
+import { initProductPreview }  from './src/components/ProductPreview/productPreview.js';
+import { TAPE_ITEMS }          from './src/utils/marketData.js';
+
+/* ── 1. Color mode ────────────────────────────────────────── */
+initColorMode(document.getElementById('theme-toggle'));
+
+/* ── 2. Background particles ──────────────────────────────── */
+initVoidCanvas('void-canvas');
+
+/* ── 3. Hero hex geometry ─────────────────────────────────── */
+initHexCanvas('hex-canvas');
+
+/* ── 4. Ticker tape ───────────────────────────────────────── */
+(function renderTape(){
+  const tape = document.getElementById('tape');
+  [...TAPE_ITEMS, ...TAPE_ITEMS].forEach(t => {
+    const isUp = t.change >= 0;
+    const div = document.createElement('div');
+    div.className = 'tape-item';
+    const fmt = t.price > 100
+      ? t.price.toLocaleString('fr-FR', {maximumFractionDigits:2})
+      : t.price.toLocaleString('fr-FR', {minimumFractionDigits:4,maximumFractionDigits:4});
+    div.innerHTML = `
+      <span class="tape-sym">${t.sym}</span>
+      <span class="tape-price">${t.price > 100 ? '$' : ''}${fmt}</span>
+      <span class="tape-chg ${isUp?'up':'dn'}">${isUp?'+':''}${t.change.toFixed(2)}%</span>
+    `;
+    tape.appendChild(div);
+  });
+})();
+
+/* ── 5. Instrument grid ───────────────────────────────────── */
+renderInstruments();
+
+/* ── 6. Data strip ────────────────────────────────────────── */
+(function renderDataStrip(){
+  const strip = document.getElementById('data-strip');
+  const cells = [
+    { label:'BTC Dominance',        val:'52.4%',   cls:'fire' },
+    { label:'Volume 24h agrégé',    val:'$248B',   cls:''     },
+    { label:'Latence médiane',      val:'<50ms',   cls:'fire' },
+    { label:'Trades/sec · Binance', val:'18 420',  cls:''     },
+    { label:'Exchanges connectés',  val:'14',      cls:''     },
+    { label:'Stream',               val:'WebSocket', cls:'fire'},
+  ];
+  cells.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'strip-cell';
+    div.innerHTML = `<span class="sc-label">${c.label}</span><span class="sc-val ${c.cls}">${c.val}</span>`;
+    strip.appendChild(div);
+  });
+})();
+
+/* ── 7. Hero price animation ──────────────────────────────── */
+initHeroPriceAnimation(
+  document.getElementById('hero-price'),
+  document.getElementById('hero-change')
+);
+
+/* ── 8. Product preview mockup ────────────────────────────── */
+initProductPreview();
+
+/* ── 9. Scroll reveal ─────────────────────────────────────── */
+initScrollReveal();
+
+/* ── 10. PWA Service Worker ───────────────────────────────── */
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js').catch(()=>{});
+}
+</script>
+
+</body>
+</html>
