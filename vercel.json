@@ -26,6 +26,6 @@
 
   "env": {
     "GEMINI_API_KEY1"  : "@gemini_api_key",
-    "ALLOWED_ORIGIN1"  : "@allowed_origin"
+    "ALLOWED_ORIGIN"  : "@allowed_origin"
   }
 }
