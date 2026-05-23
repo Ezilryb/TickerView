@@ -1,9 +1,10 @@
 /* ══════════════════════════════════════════════════════════════
    TICKERVIEW — AI Proxy  (Vercel Serverless — CommonJS)
-   api/chat.js
+   api/chat.js  v3
 
-   CORS headers sont posés au niveau infrastructure dans vercel.json.
-   Ce fichier n'a besoin que de gérer le preflight OPTIONS + POST.
+   FIX CORS : vercel.json n'applique PAS les headers CORS aux
+   Serverless Functions — ils doivent être posés manuellement sur
+   CHAQUE réponse (200, 400, 405, 500, OPTIONS inclus).
 
    Env vars → Vercel Dashboard → Settings → Environment Variables :
      GEMINI_API_KEY   clé Google AI Studio (obligatoire)
@@ -13,35 +14,45 @@ const GEMINI_MODEL   = 'gemini-2.0-flash';
 const GEMINI_API_URL =
   `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
+/* ── Helper : pose les headers CORS sur toutes les réponses ── */
+function setCors(res) {
+  res.setHeader('Access-Control-Allow-Origin',  '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Max-Age',       '86400');
+}
+
 module.exports = async function handler(req, res) {
 
-  /* ── Preflight OPTIONS ───────────────────────────────────── */
-  /* vercel.json injecte déjà les headers CORS sur cette réponse */
+  /* ── 1. CORS headers sur TOUTES les réponses ─────────────── */
+  setCors(res);
+
+  /* ── 2. Preflight OPTIONS ─────────────────────────────────── */
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
-  /* ── Seul POST est accepté ───────────────────────────────── */
+  /* ── 3. Seul POST est accepté ─────────────────────────────── */
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  /* ── Validation du body ──────────────────────────────────── */
+  /* ── 4. Validation du body ────────────────────────────────── */
   const { messages, system } = req.body || {};
   if (!Array.isArray(messages) || messages.length === 0) {
     return res.status(400).json({ error: 'messages[] requis' });
   }
 
-  /* ── Clé API — uniquement côté serveur ──────────────────── */
+  /* ── 5. Clé API — uniquement côté serveur ─────────────────── */
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     console.error('[TickerAI] GEMINI_API_KEY manquante');
     return res.status(500).json({
-      error: 'GEMINI_API_KEY manquante dans Vercel env vars',
+      error: 'GEMINI_API_KEY manquante dans les variables Vercel',
     });
   }
 
-  /* ── Construction du payload Gemini ─────────────────────── */
+  /* ── 6. Construction du payload Gemini ────────────────────── */
   const contents = [];
 
   if (system) {
@@ -62,7 +73,7 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  /* ── Appel Gemini ────────────────────────────────────────── */
+  /* ── 7. Appel Gemini ──────────────────────────────────────── */
   try {
     const geminiRes = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
       method : 'POST',
