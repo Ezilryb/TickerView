@@ -1,6 +1,9 @@
-const GEMINI_MODEL   = 'gemini-2.0-flash';
-const GEMINI_API_URL =
-  `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+const MODELS = [
+  'gemini-1.5-flash',        // quota le plus généreux (free tier)
+  'gemini-2.0-flash-lite',   // fallback
+];
+
+const BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 const CORS = {
   'Access-Control-Allow-Origin' : '*',
@@ -8,20 +11,23 @@ const CORS = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
-function cors(res) {
-  Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
+async function callGemini(apiKey, model, contents) {
+  const res = await fetch(`${BASE}/${model}:generateContent?key=${apiKey}`, {
+    method : 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body   : JSON.stringify({
+      contents,
+      generationConfig: { maxOutputTokens: 800, temperature: 0.65, topP: 0.9 },
+    }),
+  });
+  return res;
 }
 
 module.exports = async function handler(req, res) {
-  cors(res);
+  Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();   // 200, pas 204
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST')   return res.status(405).json({ error: 'Method not allowed' });
 
   try {
     const { messages, system } = req.body || {};
@@ -30,10 +36,9 @@ module.exports = async function handler(req, res) {
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return res.status(500).json({ error: 'GEMINI_API_KEY manquante' });
-    }
+    if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY manquante' });
 
+    // Build contents
     const contents = [];
     if (system) {
       contents.push({ role: 'user',  parts: [{ text: `[Système]\n${system}` }] });
@@ -46,18 +51,25 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    const geminiRes = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
-      method : 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body   : JSON.stringify({
-        contents,
-        generationConfig: { maxOutputTokens: 1000, temperature: 0.65, topP: 0.9 },
-      }),
-    });
+    // Try each model in order — fallback on 429
+    let geminiRes, usedModel;
+    for (const model of MODELS) {
+      geminiRes = await callGemini(apiKey, model, contents);
+      usedModel = model;
+      if (geminiRes.status !== 429) break;
+      console.warn(`[TickerAI] 429 sur ${model}, fallback...`);
+      await new Promise(r => setTimeout(r, 1000)); // attend 1s avant fallback
+    }
 
     if (!geminiRes.ok) {
-      const err = await geminiRes.text();
-      console.error(`[Gemini] ${geminiRes.status}:`, err);
+      const errText = await geminiRes.text();
+      console.error(`[TickerAI] ${usedModel} ${geminiRes.status}:`, errText);
+
+      if (geminiRes.status === 429) {
+        return res.status(200).json({
+          text: 'Quota Gemini temporairement atteint. Réessaie dans quelques secondes.',
+        });
+      }
       return res.status(502).json({ error: `Erreur Gemini (${geminiRes.status})` });
     }
 
