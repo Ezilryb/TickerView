@@ -1,6 +1,11 @@
+/* ══════════════════════════════════════════════════════════════
+   TICKERVIEW — AI Proxy
+   api/chat.js  v3 — Gemini 2.0 (modèles actifs)
+══════════════════════════════════════════════════════════════ */
+
 const MODELS = [
-  'gemini-1.5-flash',        // quota le plus généreux (free tier)
-  'gemini-2.0-flash-lite',   // fallback
+  'gemini-2.0-flash-lite',   // free tier, quota généreux
+  'gemini-2.0-flash',        // fallback
 ];
 
 const BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
@@ -38,11 +43,10 @@ module.exports = async function handler(req, res) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY manquante' });
 
-    // Build contents
     const contents = [];
     if (system) {
       contents.push({ role: 'user',  parts: [{ text: `[Système]\n${system}` }] });
-      contents.push({ role: 'model', parts: [{ text: 'OK.' }] });
+      contents.push({ role: 'model', parts: [{ text: 'Compris.' }] });
     }
     for (const msg of messages) {
       contents.push({
@@ -51,24 +55,20 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // Try each model in order — fallback on 429
     let geminiRes, usedModel;
     for (const model of MODELS) {
-      geminiRes = await callGemini(apiKey, model, contents);
-      usedModel = model;
+      geminiRes  = await callGemini(apiKey, model, contents);
+      usedModel  = model;
       if (geminiRes.status !== 429) break;
       console.warn(`[TickerAI] 429 sur ${model}, fallback...`);
-      await new Promise(r => setTimeout(r, 1000)); // attend 1s avant fallback
+      await new Promise(r => setTimeout(r, 1000));
     }
 
     if (!geminiRes.ok) {
       const errText = await geminiRes.text();
       console.error(`[TickerAI] ${usedModel} ${geminiRes.status}:`, errText);
-
       if (geminiRes.status === 429) {
-        return res.status(200).json({
-          text: 'Quota Gemini temporairement atteint. Réessaie dans quelques secondes.',
-        });
+        return res.status(200).json({ text: 'Quota Gemini atteint. Réessaie dans quelques secondes.' });
       }
       return res.status(502).json({ error: `Erreur Gemini (${geminiRes.status})` });
     }
