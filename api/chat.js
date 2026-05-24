@@ -4,8 +4,8 @@
 ══════════════════════════════════════════════════════════════ */
 
 const MODELS = [
-  'gemini-2.0-flash-lite',   // free tier, quota généreux
-  'gemini-2.0-flash',        // fallback
+  'gemini-1.5-flash-8b',   // free tier · RPM le plus généreux
+  'gemini-1.5-flash',      // free tier · fallback
 ];
 
 const BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
