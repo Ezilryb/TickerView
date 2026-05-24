@@ -4,8 +4,7 @@
 ══════════════════════════════════════════════════════════════ */
 
 const MODELS = [
-  'gemini-1.5-flash',         // free tier · stable
-  'gemini-1.5-flash-latest',  // alias toujours à jour · fallback
+  'gemini-2.5-flash-lite',         // free tier · stable
 ];
 
 const BASE = 'https://generativelanguage.googleapis.com/v1/models'; // ← v1, pas v1beta
