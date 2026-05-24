@@ -1,14 +1,14 @@
 /* ══════════════════════════════════════════════════════════════
    TICKERVIEW — AI Proxy
-   api/chat.js  v4 — Gemini 1.5 free tier uniquement
+   api/chat.js  v5 — endpoint v1 stable + modèles corrects
 ══════════════════════════════════════════════════════════════ */
 
 const MODELS = [
-  'gemini-1.5-flash-8b',  // free tier · quota le plus généreux
-  'gemini-1.5-flash',     // free tier · fallback
+  'gemini-1.5-flash',         // free tier · stable
+  'gemini-1.5-flash-latest',  // alias toujours à jour · fallback
 ];
 
-const BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
+const BASE = 'https://generativelanguage.googleapis.com/v1/models'; // ← v1, pas v1beta
 
 const CORS = {
   'Access-Control-Allow-Origin' : '*',
@@ -65,20 +65,17 @@ module.exports = async function handler(req, res) {
         await new Promise(r => setTimeout(r, 1200));
         continue;
       }
-      break;
+      break; // succès ou erreur non-429 → on sort
     }
 
     if (geminiRes.status === 429) {
-      console.error('[TickerAI] Tous les modèles en 429. Body:', lastErr);
-      return res.status(200).json({
-        text: `⚠️ Quota temporaire atteint sur tous les modèles. Vérifie que l'API "Generative Language" est bien activée sur ton projet Google Cloud, et que la clé n'est pas restreinte par IP. Détail : ${lastErr.slice(0, 120)}`,
-      });
+      return res.status(200).json({ text: '⏳ Quota temporaire atteint. Réessaie dans 30 secondes.' });
     }
 
     if (!geminiRes.ok) {
       const errText = await geminiRes.text();
       console.error(`[TickerAI] ${usedModel} ${geminiRes.status}:`, errText);
-      return res.status(502).json({ error: `Erreur Gemini ${geminiRes.status} — ${errText.slice(0, 200)}` });
+      return res.status(502).json({ error: `Gemini ${geminiRes.status} — ${errText.slice(0, 300)}` });
     }
 
     const data = await geminiRes.json();
